@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.my-scrollbar {
+  @apply scrollbar-thin scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-thumb-color-scrollbar-light-thumb scrollbar-track-color-scrollbar-light-track dark:scrollbar-thin dark:scrollbar-thumb-color-scrollbar-dark-thumb dark:scrollbar-track-color-scrollbar-dark-track
+}
+
+.unfollow_button:hover span {
+  display: none;
+}
+
+.unfollow_button:hover::before {
+  content: "Unfollow";
+}
+
+.preventcopy {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+[contenteditable][placeholder]:empty:before {
+  content: attr(placeholder);
+  color: #9CA3AF;
+}

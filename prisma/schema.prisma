@@ -1,0 +1,148 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Users {
+  id                              Int                         @unique                   @default(autoincrement())
+  uuid                            String                      @id                       @default(uuid())
+  verify_email                    Boolean                                               @default(false)
+  profile                         Profile[]
+  coverphoto                      CoverPhoto[]
+  shortbio                        String?
+  account_type                    String
+  name                            String
+  phone                           String
+  username                        String
+  email                           String
+  password                        String
+  facebook                        String?
+  instagram                       String?
+  twitter                         String?
+  tiktok                          String?
+  youtube                         String?
+  composition                     Compositions[]
+  pinned                          Pinned[]
+  likes                           Likes[]
+  comments                        Comments[]
+  bookmarks                       Bookmarks[]
+  followedBy                      Follows[]                                             @relation("follower")
+  following                       Follows[]                                             @relation("following")
+  notificationFollows             Notifications[]                                       @relation("notificationFollows")
+  notificationFrom                Notifications[]                                       @relation("notificationFrom")
+  notificationTo                  Notifications[]                                       @relation("notificationTo")
+}
+
+model Profile {
+  id                              String                      @id                       @default(uuid())
+  publicId                        String                      @unique
+  format                          String
+  version                         String
+  user                            Users                                                 @relation(fields: [userId], references: [uuid], onDelete: Cascade)
+  userId                          String
+}
+
+model CoverPhoto {
+  id                              String                      @id                       @default(uuid())
+  publicId                        String                      @unique
+  format                          String
+  version                         String
+  user                            Users                                                 @relation(fields: [userId], references: [uuid], onDelete: Cascade)
+  userId                          String
+}
+
+model Compositions {
+  id                              Int                         @unique                   @default(autoincrement())
+  uuid                            String                      @id                       @default(uuid())
+  title                           String
+  description                     String
+  content                         String
+  category                        String
+  status                          String
+  slug                            String
+  datePublished                   String
+  dateEdited                      String?
+  spotify                         String?
+  applemusic                      String?
+  youtube                         String?
+  pinned                          Pinned[]
+  likes                           Likes[]
+  comments                        Comments[]
+  bookmarks                       Bookmarks[]
+  notifications                   Notifications[]                                       @relation("notificationComposition")
+  user                            Users                                                 @relation(fields: [userId], references: [uuid], onDelete: Cascade)
+  userId                          String
+}
+
+model Pinned {
+  id                              Int                         @unique                   @default(autoincrement())
+  uuid                            String                      @id                       @default(uuid())
+  user                            Users                                                 @relation(fields: [userId], references: [uuid], onDelete: Cascade)
+  userId                          String
+  composition                     Compositions                                          @relation(fields: [compositionId], references: [uuid], onDelete: Cascade)
+  compositionId                   String
+}
+
+model Likes {
+  id                              Int                         @unique                   @default(autoincrement())
+  uuid                            String                      @id                       @default(uuid())
+  user                            Users                                                 @relation(fields: [userId], references: [uuid], onDelete: Cascade)
+  userId                          String
+  composition                     Compositions                                          @relation(fields: [compositionId], references: [uuid], onDelete: Cascade)
+  compositionId                   String
+}
+
+model Comments {
+  id                              Int                         @unique                   @default(autoincrement())
+  uuid                            String                      @id                       @default(uuid())
+  content                         String
+  date                            String
+  user                            Users                                                 @relation(fields: [userId], references: [uuid], onDelete: Cascade)
+  userId                          String
+  composition                     Compositions                                          @relation(fields: [compositionId], references: [uuid], onDelete: Cascade)
+  compositionId                   String
+}
+
+model Bookmarks {
+  id                              Int                         @unique                   @default(autoincrement())
+  uuid                            String                      @id                       @default(uuid())
+  user                            Users                                                 @relation(fields: [userId], references: [uuid], onDelete: Cascade)
+  userId                          String
+  composition                     Compositions                                          @relation(fields: [compositionId], references: [uuid], onDelete: Cascade)
+  compositionId                   String
+}
+
+model Follows {
+  id                              Int                         @unique                   @default(autoincrement())
+  follower                        Users?                                                @relation("follower", fields: [followerId], references: [uuid], onDelete: Cascade)
+  followerId                      String
+  following                       Users?                                                @relation("following", fields: [followingId], references: [uuid], onDelete: Cascade)
+  followingId                     String
+
+  @@id([followerId, followingId])
+}
+
+model Notifications {
+  id                              Int                         @id                       @default(autoincrement())
+  type                            String
+  read                            Boolean                                               @default(false)
+  message                         String
+  date                            String
+  follows                         Users?                                                @relation("notificationFollows", fields: [followsId], references: [uuid], onDelete: Cascade)
+  followsId                       String?
+  composition                     Compositions?                                         @relation("notificationComposition", fields: [compositionId], references: [uuid], onDelete: Cascade)
+  compositionId                   String?
+  notificationFrom                Users?                                                @relation("notificationFrom", fields: [notificationFromId], references: [uuid], onDelete: Cascade)
+  notificationFromId              String
+  notificationTo                  Users?                                                @relation("notificationTo", fields: [notificationToId], references: [uuid], onDelete: Cascade)
+  notificationToId                String
+
+  @@index([followsId, compositionId, notificationFromId, notificationToId])
+}
